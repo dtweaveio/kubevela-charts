@@ -1,7 +1,21 @@
-description: An addon for KubeVela.
-icon: ""
+name: open-kruise
 invisible: false
-name: openkruise
-tags:
-- my-tag
 version: 1.0.0
+description: OpenKruise is an extended component suite for Kubernetes, which mainly focuses on automated management of large-scale applications, such as deployment, upgrade, ops and availability protection.
+url: "https://openkruise.io/"
+icon: "https://openkruise.io/zh/img/openkruise.ico"
+tags:
+  - openkruise
+  - kubernetes
+  - kruise
+  - workload
+  - statefulset
+  - sidecar
+  - job
+  - deployment
+  - cloneset
+system:
+  vela: ">=v1.8.0"
+  kubernetes: ">= 1.16.0-0"
+deployTo:
+  runtimeCluster: true
