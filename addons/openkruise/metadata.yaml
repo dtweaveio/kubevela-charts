@@ -6,13 +6,8 @@ url: "https://openkruise.io/"
 icon: "https://openkruise.io/zh/img/openkruise.ico"
 tags:
   - openkruise
-  - kubernetes
   - kruise
   - workload
-  - statefulset
-  - sidecar
-  - job
-  - deployment
   - cloneset
 system:
   vela: ">=v1.8.0"

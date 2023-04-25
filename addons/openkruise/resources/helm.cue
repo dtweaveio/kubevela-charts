@@ -13,6 +13,6 @@ openKruise: {
   			managed: parameter.crds.managed
 			installation:
 				namespace: parameter.installation.namespace
-				createNamespace: true
+				createNamespace: parameter.installation.createNamespace
 	}
 }
