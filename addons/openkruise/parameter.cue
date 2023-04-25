@@ -10,8 +10,7 @@ parameter: {
 	}
 	// +usage=Custom parameter description
 	installation: {
-		namespace:       "kruise-system"
+		namespace:       *"kruise-system" | string
 		createNamespace: true
 	}
-	myparam: *"myns" | string
 }
