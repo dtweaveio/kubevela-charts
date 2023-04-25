@@ -5,7 +5,6 @@ description: OpenKruise is an extended component suite for Kubernetes, which mai
 url: "https://openkruise.io/"
 icon: "https://openkruise.io/zh/img/openkruise.ico"
 tags:
-  - openkruise
   - kruise
   - workload
   - cloneset
