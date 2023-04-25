@@ -39,5 +39,23 @@ openKruise: {
 						cpu: parameter.manager.resources.limits.cpu
 						memory: parameter.manager.resources.limits.memory
 				hostNetwork: parameter.manager.hostNetwork
+			webhookConfiguration:
+				failurePolicy:
+					pods: parameter.webhookConfiguration.failurePolicy.pods
+				timeoutSeconds: parameter.webhookConfiguration.timeoutSeconds
+			daemon:
+				log:
+					level: parameter.daemon.log.level
+				port: parameter.daemon.port
+  			pprofAddr: parameter.daemon.pprofAddr
+  			socketLocation: parameter.daemon.socketLocation
+  			socketFile: parameter.daemon.socketFile
+				resources:
+    			limits:
+      			cpu: parameter.daemon.resources.limits.cpu
+      			memory: parameter.daemon.resources.limits.memory
+    			requests:
+      			cpu: parameter.daemon.resources.limits.cpu
+      			memory: parameter.daemon.resources.limits.memory
 	}
 }

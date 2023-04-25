@@ -47,4 +47,34 @@ parameter: {
 		}
 		hostNetwork: *true | bool
 	}
+	webhookConfiguration: {
+		failurePolicy: {
+			pods: *"Ignore" | string
+		}
+		timeoutSeconds: *30 | int
+	}
+	daemon: {
+		log: {
+			level: *"4" | string
+		}
+		port:           *10221 | int
+		pprofAddr:      *"localhost:10222" | string
+		socketLocation: "/var/run" | string
+		socketFile:     *"" | string
+		nodeSelector: {}
+		resources: {
+			limits: {
+				cpu:    *"50m" | string
+				memory: *"128Mi" | string
+			}
+			requests: {
+				cpu:    *"0" | string
+				memory: *"0" | string
+			}
+		}
+		extraEnvs: []
+	}
+	serviceAccount: {
+		annotations: {}
+	}
 }
