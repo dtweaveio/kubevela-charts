@@ -6,11 +6,11 @@
 // container images, ports, and etc.
 parameter: {
 	crds: {
-		managed: true | boolean
+		managed: *true | bool
 	}
 	// +usage=Custom parameter description
 	installation: {
 		namespace:       *"kruise-system" | string
-		createNamespace: true | boolean
+		createNamespace: *true | bool
 	}
 }
