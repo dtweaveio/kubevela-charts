@@ -14,5 +14,30 @@ openKruise: {
 			installation:
 				namespace: parameter.installation.namespace
 				createNamespace: parameter.installation.createNamespace
+			featureGates: parameter.featureGates
+			enableKubeCacheMutationDetector: parameter.enableKubeCacheMutationDetector
+			manager:
+				log:
+					level: parameter.manager.log.level
+				replicas: parameter.manager.replicas
+				image:
+					repository: parameter.manager.image.repository
+					tag: parameter.manager.image.tag
+				webhook:
+					port: parameter.manager.webhook.port
+				metrics:
+					port: parameter.manager.metrics.metrics
+				healthProbe:
+					port: parameter.manager.healthProbe.port
+				pprofAddr: parameter.manager.pprofAddr
+				resyncPeriod: parameter.manager.resyncPeriod
+				resources:
+					limits:
+						cpu: parameter.manager.resources.limits.cpu
+						memory: parameter.manager.resources.limits.memory
+					requests:
+						cpu: parameter.manager.resources.limits.cpu
+						memory: parameter.manager.resources.limits.memory
+				hostNetwork: parameter.manager.hostNetwork
 	}
 }
