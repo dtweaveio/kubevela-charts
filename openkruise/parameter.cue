@@ -5,6 +5,13 @@
 // For example, you can use parameters to allow the user to customize
 // container images, ports, and etc.
 parameter: {
+	crds: {
+		managed: true
+	}
 	// +usage=Custom parameter description
+	installation: {
+		namespace:       "kruise-system"
+		createNamespace: true
+	}
 	myparam: *"myns" | string
 }
