@@ -26,7 +26,7 @@ openKruise: {
 				webhook:
 					port: parameter.manager.webhook.port
 				metrics:
-					port: parameter.manager.metrics.metrics
+					port: parameter.manager.metrics.port
 				healthProbe:
 					port: parameter.manager.healthProbe.port
 				pprofAddr: parameter.manager.pprofAddr

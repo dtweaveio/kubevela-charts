@@ -42,7 +42,7 @@ parameter: {
 			}
 			requests: {
 				cpu:    *"200m" | string
-				memory: *"512Mi" | strig
+				memory: *"512Mi" | string
 			}
 		}
 		hostNetwork: *true | bool
@@ -59,9 +59,8 @@ parameter: {
 		}
 		port:           *10221 | int
 		pprofAddr:      *"localhost:10222" | string
-		socketLocation: "/var/run" | string
+		socketLocation: *"/var/run" | string
 		socketFile:     *"" | string
-		nodeSelector: {}
 		resources: {
 			limits: {
 				cpu:    *"50m" | string
@@ -72,9 +71,5 @@ parameter: {
 				memory: *"0" | string
 			}
 		}
-		extraEnvs: []
-	}
-	serviceAccount: {
-		annotations: {}
 	}
 }
