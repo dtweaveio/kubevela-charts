@@ -56,10 +56,10 @@ openKruise: {
 					nodeAffinity: parameter.manager.nodeAffinity
 				}
 				if parameter.manager.nodeSelector != _|_ {
-					nodeAffinity: parameter.manager.nodeSelector
+					nodeSelector: parameter.manager.nodeSelector
 				}
 				if parameter.manager.tolerations != _|_ {
-					nodeAffinity: parameter.manager.tolerations
+					tolerations: parameter.manager.tolerations
 				}
 			}
 			webhookConfiguration: {
@@ -78,8 +78,12 @@ openKruise: {
 				if parameter.daemon.socketFile != _|_ {
 					socketFile: parameter.daemon.socketFile
 				}
-				nodeSelector: *{} | {...}
-				extraEnvs:    *[] | [...]
+				if parameter.daemon.nodeSelector != _|_ {
+					nodeSelector: parameter.daemon.nodeSelector
+				}
+				if parameter.daemon.extraEnvs != _|_ {
+					extraEnvs: parameter.daemon.extraEnvs
+				}
 				resources: {
 					limits: {
 						cpu:    parameter.daemon.resources.limits.cpu

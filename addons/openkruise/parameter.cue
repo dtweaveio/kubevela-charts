@@ -67,6 +67,8 @@ parameter: {
 		pprofAddr:      *"localhost:10222" | string
 		socketLocation: *"/var/run" | string
 		socketFile?:    *"" | string
+		nodeSelector:   *{} | {...}
+		extraEnvs:      *[] | [...]
 		resources: {
 			limits: {
 				cpu:    *"50m" | string
