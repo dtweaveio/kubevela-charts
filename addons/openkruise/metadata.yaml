@@ -1,7 +1,7 @@
 name: open-kruise
 invisible: false
 version: 1.0.0
-description: OpenKruise is an extended component suite for Kubernetes, which mainly focuses on automated management of large-scale applications, such as deployment, upgrade, ops and availability protection.
+description: OpenKruise is an extended component suite for Kubernetes.
 url: "https://openkruise.io/"
 icon: "https://openkruise.io/zh/img/openkruise.ico"
 tags:
