@@ -47,7 +47,10 @@ openKruise: {
 						cpu:    parameter.manager.resources.limits.cpu
 						memory: parameter.manager.resources.limits.memory
 					}
-					hostNetwork: parameter.manager.hostNetwork
+					hostNetwork:  parameter.manager.hostNetwork
+					nodeAffinity: *{} | {...}
+					nodeSelector: *{} | {...}
+					tolerations:  *[] | [...]
 				}
 			}
 			webhookConfiguration: {
@@ -64,6 +67,8 @@ openKruise: {
 				pprofAddr:      parameter.daemon.pprofAddr
 				socketLocation: parameter.daemon.socketLocation
 				socketFile:     parameter.daemon.socketFile
+				nodeSelector:   *{} | {...}
+				extraEnvs:      *[] | [...]
 				resources: {
 					limits: {
 						cpu:    parameter.daemon.resources.limits.cpu
@@ -74,6 +79,9 @@ openKruise: {
 						memory: parameter.daemon.resources.limits.memory
 					}
 				}
+			}
+			serviceAccount: {
+				annotations: *{} | {...}
 			}
 		}
 	}
