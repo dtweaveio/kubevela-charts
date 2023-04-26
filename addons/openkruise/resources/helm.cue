@@ -5,7 +5,7 @@ openKruise: {
 	name: "open-kruise"
 	properties: {
 		repoType: "helm"
-		url:      "https://openkruise.github.io/charts"
+		url:      "https://openkruise.github.io/charts/"
 		chart:    "kruise"
 		version:  "1.4.0"
 		values: {
