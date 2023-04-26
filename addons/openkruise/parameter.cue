@@ -45,13 +45,19 @@ parameter: {
 				memory: *"512Mi" | string
 			}
 		}
-		hostNetwork: *true | bool
+		hostNetwork:  *true | bool
+		nodeAffinity: *{} | {...}
+		nodeSelector: *{} | {...}
+		tolerations:  *[] | [...]
 	}
 	webhookConfiguration: {
 		failurePolicy: {
 			pods: *"Ignore" | string
 		}
 		timeoutSeconds: *30 | int
+	}
+	serviceAccount: {
+		annotations: *{} | {...}
 	}
 	daemon: {
 		log: {

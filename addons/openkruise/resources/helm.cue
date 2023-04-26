@@ -49,10 +49,17 @@ openKruise: {
 						cpu:    parameter.manager.resources.limits.cpu
 						memory: parameter.manager.resources.limits.memory
 					}
-					hostNetwork:  parameter.manager.hostNetwork
-					nodeAffinity: *{} | {...}
-					nodeSelector: *{} | {...}
-					tolerations:  *[] | [...]
+				}
+				hostNetwork: parameter.manager.hostNetwork
+
+				if parameter.manager.nodeAffinity != _|_ {
+					nodeAffinity: parameter.manager.nodeAffinity
+				}
+				if parameter.manager.nodeSelector != _|_ {
+					nodeAffinity: parameter.manager.nodeSelector
+				}
+				if parameter.manager.tolerations != _|_ {
+					nodeAffinity: parameter.manager.tolerations
 				}
 			}
 			webhookConfiguration: {
@@ -85,7 +92,9 @@ openKruise: {
 				}
 			}
 			serviceAccount: {
-				annotations: *{} | {...}
+				if parameter.serviceAccount.annotations != _|_ {
+					annotations: parameter.serviceAccount.annotations
+				}
 			}
 		}
 	}
