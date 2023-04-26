@@ -46,9 +46,9 @@ parameter: {
 			}
 		}
 		hostNetwork:  *true | bool
-		nodeAffinity: *{} | {...}
-		nodeSelector: *{} | {...}
-		tolerations:  *[] | [...]
+		nodeAffinity?: *{} | {...}
+		nodeSelector?: *{} | {...}
+		tolerations?:  *[] | [...]
 	}
 	webhookConfiguration: {
 		failurePolicy: {
@@ -57,7 +57,7 @@ parameter: {
 		timeoutSeconds: *30 | int
 	}
 	serviceAccount: {
-		annotations: *{} | {...}
+		annotations?: *{} | {...}
 	}
 	daemon: {
 		log: {
@@ -67,8 +67,8 @@ parameter: {
 		pprofAddr:      *"localhost:10222" | string
 		socketLocation: *"/var/run" | string
 		socketFile?:    *"" | string
-		nodeSelector:   *{} | {...}
-		extraEnvs:      *[] | [...]
+		nodeSelector?:   *{} | {...}
+		extraEnvs?:      *[] | [...]
 		resources: {
 			limits: {
 				cpu:    *"50m" | string
