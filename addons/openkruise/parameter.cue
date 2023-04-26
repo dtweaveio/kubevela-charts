@@ -13,13 +13,13 @@ parameter: {
 		namespace:       *"kruise-system" | string
 		createNamespace: *true | bool
 	}
-	featureGates:                    *"" | string
+	featureGates?:                    *"" | string
 	enableKubeCacheMutationDetector: *false | bool
 	manager: {
 		log: {
 			level: *"4" | string
 		}
-		replicas: *2 | int
+		replicas: *1 | int
 		image: {
 			repository: *"openkruise/kruise-manager" | string
 			tag:        *"v1.4.0" | string
