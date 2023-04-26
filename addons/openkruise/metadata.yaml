@@ -13,3 +13,5 @@ system:
   kubernetes: ">= 1.16.0-0"
 deployTo:
   runtimeCluster: true
+dependencies:
+  - name: fluxcd
