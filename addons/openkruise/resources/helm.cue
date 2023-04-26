@@ -5,7 +5,7 @@ openKruise: {
 	name: "open-kruise"
 	properties: {
 		repoType: "helm"
-		url:      "https://openkruise.github.io/charts/"
+		url:      "https://openkruise.github.io/charts"
 		chart:    "kruise"
 		version:  "1.4.0"
 		values: {
@@ -66,9 +66,11 @@ openKruise: {
 				port:           parameter.daemon.port
 				pprofAddr:      parameter.daemon.pprofAddr
 				socketLocation: parameter.daemon.socketLocation
-				socketFile:     parameter.daemon.socketFile
-				nodeSelector:   *{} | {...}
-				extraEnvs:      *[] | [...]
+				if parameter.daemon.socketFile != _|_ {
+					socketFile: parameter.daemon.socketFile
+				}
+				nodeSelector: *{} | {...}
+				extraEnvs:    *[] | [...]
 				resources: {
 					limits: {
 						cpu:    parameter.daemon.resources.limits.cpu

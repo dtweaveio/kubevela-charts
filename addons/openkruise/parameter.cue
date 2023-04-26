@@ -60,7 +60,7 @@ parameter: {
 		port:           *10221 | int
 		pprofAddr:      *"localhost:10222" | string
 		socketLocation: *"/var/run" | string
-		socketFile?:    string
+		socketFile?:    *"" | string
 		resources: {
 			limits: {
 				cpu:    *"50m" | string
