@@ -16,7 +16,9 @@ openKruise: {
 				namespace:       parameter.installation.namespace
 				createNamespace: parameter.installation.createNamespace
 			}
-			featureGates:                    parameter.featureGates
+			if parameter.featureGates != _|_ {
+				featureGates: parameter.featureGates
+			}
 			enableKubeCacheMutationDetector: parameter.enableKubeCacheMutationDetector
 			manager: {
 				log: {
