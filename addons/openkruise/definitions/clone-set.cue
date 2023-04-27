@@ -17,27 +17,30 @@ import (
 
 template: {
 	output: {
-		selector: matchLabels: {
-			"app.oam.dev/component": context.name
-		}
-		template: {
-			metadata: {
-				labels: {
-					if parameter.labels != _|_ {
-						parameter.labels
-					}
-					if parameter.addRevisionLabel {
-						"app.oam.dev/revision": context.revision
-					}
-					"app.oam.dev/name":      context.appName
-					"app.oam.dev/component": context.name
-				}
-				if parameter.annotations != _|_ {
-					annotations: parameter.annotations
-				}
+		apiVersion: "apps.kruise.io/v1alpha1"
+		kind:       "CloneSet"
+		spec: {
+			selector: matchLabels: {
+				"app.oam.dev/component": context.name
 			}
-			spec: {
-				containers: [{
+			template: {
+				metadata: {
+					labels: {
+						if parameter.labels != _|_ {
+							parameter.labels
+						}
+						if parameter.addRevisionLabel {
+							"app.oam.dev/revision": context.revision
+						}
+						"app.oam.dev/name":      context.appName
+						"app.oam.dev/component": context.name
+					}
+					if parameter.annotations != _|_ {
+						annotations: parameter.annotations
+					}
+				}
+				spec: {
+					containers: [{
 						name:  context.name
 						image: parameter.image
 
@@ -113,6 +116,7 @@ template: {
 							readinessProbe: parameter.readinessProbe
 						}
 					}]
+				}
 			}
 		}
 	}
@@ -147,10 +151,6 @@ template: {
 			// +usage=exposed node port. Only Valid when exposeType is NodePort
 			nodePort?: int
 		}]
-
-		// +ignore
-		// +usage=Specify what kind of Service you want. options: "ClusterIP", "NodePort", "LoadBalancer"
-		exposeType: *"ClusterIP" | "NodePort" | "LoadBalancer"
 
 		// +ignore
 		// +usage=If addRevisionLabel is true, the revision label will be added to the underlying pods
