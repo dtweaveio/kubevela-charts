@@ -4,7 +4,7 @@ output: {
 	apiVersion: "core.oam.dev/v1beta1"
 	kind:       "Application"
 	spec: {
-		components: [openKruise]
+		components: [openKruise,resourceRelation]
 		policies: [{
 			type: "topology"
 			name: "deploy-topology"
