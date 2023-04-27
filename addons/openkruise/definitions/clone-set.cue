@@ -1,4 +1,9 @@
-cloneset: {
+import (
+	"strconv"
+	"strings"
+)
+
+"clone-set": {
 	type:  "component"
 	alias: ""
 	annotations: {}
@@ -11,7 +16,106 @@ cloneset: {
 }
 
 template: {
-	output: {}
+	output: {
+		selector: matchLabels: {
+			"app.oam.dev/component": context.name
+		}
+		template: {
+			metadata: {
+				labels: {
+					if parameter.labels != _|_ {
+						parameter.labels
+					}
+					if parameter.addRevisionLabel {
+						"app.oam.dev/revision": context.revision
+					}
+					"app.oam.dev/name":      context.appName
+					"app.oam.dev/component": context.name
+				}
+				if parameter.annotations != _|_ {
+					annotations: parameter.annotations
+				}
+			}
+			spec: {
+				containers: [{
+						name:  context.name
+						image: parameter.image
+
+						if parameter["ports"] != _|_ {
+							ports: [ for v in parameter.ports {
+								{
+									containerPort: v.port
+									protocol:      v.protocol
+									if v.name != _|_ {
+										name: v.name
+									}
+									if v.name == _|_ {
+										_name: "port-" + strconv.FormatInt(v.port, 10)
+										name:  *_name | string
+										if v.protocol != "TCP" {
+											name: _name + "-" + strings.ToLower(v.protocol)
+										}
+									}
+								}}]
+						}
+
+						if parameter["imagePullPolicy"] != _|_ {
+							imagePullPolicy: parameter.imagePullPolicy
+						}
+
+						if parameter["cmd"] != _|_ {
+							command: parameter.cmd
+						}
+
+						if parameter["args"] != _|_ {
+							args: parameter.args
+						}
+
+						if parameter["env"] != _|_ {
+							env: parameter.env
+						}
+
+						if context["config"] != _|_ {
+							env: context.config
+						}
+
+						if parameter["cpu"] != _|_ {
+							resources: {
+								limits: cpu:   parameter.cpu
+								requests: cpu: parameter.cpu
+							}
+						}
+
+						if parameter["memory"] != _|_ {
+							resources: {
+								limits: memory:   parameter.memory
+								requests: memory: parameter.memory
+							}
+						}
+
+						if parameter["volumes"] != _|_ && parameter["volumeMounts"] == _|_ {
+							volumeMounts: [ for v in parameter.volumes {
+								{
+									mountPath: v.mountPath
+									name:      v.name
+								}}]
+						}
+
+						if parameter["volumeMounts"] != _|_ {
+							volumeMounts: mountsArray
+						}
+
+						if parameter["livenessProbe"] != _|_ {
+							livenessProbe: parameter.livenessProbe
+						}
+
+						if parameter["readinessProbe"] != _|_ {
+							readinessProbe: parameter.readinessProbe
+						}
+					}]
+			}
+		}
+	}
 
 	parameter: {
 		// +usage=Specify the labels in the workload
@@ -29,11 +133,6 @@ template: {
 
 		// +usage=Specify image pull secrets for your service
 		imagePullSecrets?: [...string]
-
-		// +ignore
-		// +usage=Deprecated field, please use ports instead
-		// +short=p
-		port?: int
 
 		// +usage=Which ports do you want customer traffic sent to, defaults to 80
 		ports?: [...{
