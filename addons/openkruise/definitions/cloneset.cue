@@ -11,158 +11,7 @@ cloneset: {
 }
 
 template: {
-	output: {
-		spec: {
-			selector: matchLabels: {
-				"app.oam.dev/component": context.name
-			}
-
-			template: {
-				metadata: {
-					labels: {
-						if parameter.labels != _|_ {
-							parameter.labels
-						}
-						if parameter.addRevisionLabel {
-							"app.oam.dev/revision": context.revision
-						}
-						"app.oam.dev/name":      context.appName
-						"app.oam.dev/component": context.name
-					}
-					if parameter.annotations != _|_ {
-						annotations: parameter.annotations
-					}
-				}
-
-				spec: {
-					containers: [{
-						name:  context.name
-						image: parameter.image
-						if parameter["ports"] != _|_ {
-							ports: [ for v in parameter.ports {
-								{
-									containerPort: v.port
-									protocol:      v.protocol
-									if v.name != _|_ {
-										name: v.name
-									}
-									if v.name == _|_ {
-										_name: "port-" + strconv.FormatInt(v.port, 10)
-										name:  *_name | string
-										if v.protocol != "TCP" {
-											name: _name + "-" + strings.ToLower(v.protocol)
-										}
-									}
-								}}]
-						}
-
-						if parameter["imagePullPolicy"] != _|_ {
-							imagePullPolicy: parameter.imagePullPolicy
-						}
-
-						if parameter["cmd"] != _|_ {
-							command: parameter.cmd
-						}
-
-						if parameter["args"] != _|_ {
-							args: parameter.args
-						}
-
-						if parameter["env"] != _|_ {
-							env: parameter.env
-						}
-
-						if context["config"] != _|_ {
-							env: context.config
-						}
-
-						if parameter["cpu"] != _|_ {
-							resources: {
-								limits: cpu:   parameter.cpu
-								requests: cpu: parameter.cpu
-							}
-						}
-
-						if parameter["memory"] != _|_ {
-							resources: {
-								limits: memory:   parameter.memory
-								requests: memory: parameter.memory
-							}
-						}
-
-						if parameter["volumes"] != _|_ && parameter["volumeMounts"] == _|_ {
-							volumeMounts: [ for v in parameter.volumes {
-								{
-									mountPath: v.mountPath
-									name:      v.name
-								}}]
-						}
-
-						if parameter["volumeMounts"] != _|_ {
-							volumeMounts: mountsArray
-						}
-
-						if parameter["livenessProbe"] != _|_ {
-							livenessProbe: parameter.livenessProbe
-						}
-
-						if parameter["readinessProbe"] != _|_ {
-							readinessProbe: parameter.readinessProbe
-						}
-
-					}]
-
-					if parameter["hostAliases"] != _|_ {
-						// +patchKey=ip
-						hostAliases: parameter.hostAliases
-					}
-
-					if parameter["imagePullSecrets"] != _|_ {
-						imagePullSecrets: [ for v in parameter.imagePullSecrets {
-							name: v
-						},
-						]
-					}
-
-					if parameter["volumes"] != _|_ && parameter["volumeMounts"] == _|_ {
-						volumes: [ for v in parameter.volumes {
-							{
-								name: v.name
-								if v.type == "pvc" {
-									persistentVolumeClaim: claimName: v.claimName
-								}
-								if v.type == "configMap" {
-									configMap: {
-										defaultMode: v.defaultMode
-										name:        v.cmName
-										if v.items != _|_ {
-											items: v.items
-										}
-									}
-								}
-								if v.type == "secret" {
-									secret: {
-										defaultMode: v.defaultMode
-										secretName:  v.secretName
-										if v.items != _|_ {
-											items: v.items
-										}
-									}
-								}
-								if v.type == "emptyDir" {
-									emptyDir: medium: v.medium
-								}
-							}
-						}]
-					}
-
-					if parameter["volumeMounts"] != _|_ {
-						volumes: deDupVolumesArray
-					}
-				}
-			}
-		}
-	}
+	output: {}
 
 	parameter: {
 		// +usage=Specify the labels in the workload
@@ -181,6 +30,11 @@ template: {
 		// +usage=Specify image pull secrets for your service
 		imagePullSecrets?: [...string]
 
+		// +ignore
+		// +usage=Deprecated field, please use ports instead
+		// +short=p
+		port?: int
+
 		// +usage=Which ports do you want customer traffic sent to, defaults to 80
 		ports?: [...{
 			// +usage=Number of port to expose on the pod's IP address
@@ -194,6 +48,10 @@ template: {
 			// +usage=exposed node port. Only Valid when exposeType is NodePort
 			nodePort?: int
 		}]
+
+		// +ignore
+		// +usage=Specify what kind of Service you want. options: "ClusterIP", "NodePort", "LoadBalancer"
+		exposeType: *"ClusterIP" | "NodePort" | "LoadBalancer"
 
 		// +ignore
 		// +usage=If addRevisionLabel is true, the revision label will be added to the underlying pods
@@ -331,6 +189,123 @@ template: {
 			hostnames: [...string]
 		}]
 	}
+
+	mountsArray: [
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.pvc != _|_ for v in parameter.volumeMounts.pvc {
+			{
+				mountPath: v.mountPath
+				if v.subPath != _|_ {
+					subPath: v.subPath
+				}
+				name: v.name
+			}
+		},
+
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.configMap != _|_ for v in parameter.volumeMounts.configMap {
+			{
+				mountPath: v.mountPath
+				if v.subPath != _|_ {
+					subPath: v.subPath
+				}
+				name: v.name
+			}
+		},
+
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.secret != _|_ for v in parameter.volumeMounts.secret {
+			{
+				mountPath: v.mountPath
+				if v.subPath != _|_ {
+					subPath: v.subPath
+				}
+				name: v.name
+			}
+		},
+
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.emptyDir != _|_ for v in parameter.volumeMounts.emptyDir {
+			{
+				mountPath: v.mountPath
+				if v.subPath != _|_ {
+					subPath: v.subPath
+				}
+				name: v.name
+			}
+		},
+
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.hostPath != _|_ for v in parameter.volumeMounts.hostPath {
+			{
+				mountPath: v.mountPath
+				if v.subPath != _|_ {
+					subPath: v.subPath
+				}
+				name: v.name
+			}
+		},
+	]
+
+	volumesList: [
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.pvc != _|_ for v in parameter.volumeMounts.pvc {
+			{
+				name: v.name
+				persistentVolumeClaim: claimName: v.claimName
+			}
+		},
+
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.configMap != _|_ for v in parameter.volumeMounts.configMap {
+			{
+				name: v.name
+				configMap: {
+					defaultMode: v.defaultMode
+					name:        v.cmName
+					if v.items != _|_ {
+						items: v.items
+					}
+				}
+			}
+		},
+
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.secret != _|_ for v in parameter.volumeMounts.secret {
+			{
+				name: v.name
+				secret: {
+					defaultMode: v.defaultMode
+					secretName:  v.secretName
+					if v.items != _|_ {
+						items: v.items
+					}
+				}
+			}
+		},
+
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.emptyDir != _|_ for v in parameter.volumeMounts.emptyDir {
+			{
+				name: v.name
+				emptyDir: medium: v.medium
+			}
+		},
+
+		if parameter.volumeMounts != _|_ && parameter.volumeMounts.hostPath != _|_ for v in parameter.volumeMounts.hostPath {
+			{
+				name: v.name
+				hostPath: {
+					path: v.path
+				}
+			}
+		},
+	]
+
+	deDupVolumesArray: [
+		for val in [
+			for i, vi in volumesList {
+				for j, vj in volumesList if j < i && vi.name == vj.name {
+					_ignore: true
+				}
+				vi
+			},
+		] if val._ignore == _|_ {
+			val
+		},
+	]
+
 	#HealthProbe: {
 		// +usage=Instructions for assessing container health by executing a command. Either this attribute or the httpGet attribute or the tcpSocket attribute MUST be specified. This attribute is mutually exclusive with both the httpGet attribute and the tcpSocket attribute.
 		exec?: {
