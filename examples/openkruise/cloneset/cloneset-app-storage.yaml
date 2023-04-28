@@ -13,14 +13,10 @@ spec:
             - name: config-vol
               cmName: test
               mountPath: /etc/config
-          pvc:
-            - name: test
-              mountPath: /mnt
-              claimName: test
-        volumes:
-          - name: test1
-            mountPath: /mnt1
-            type: emptyDir
+        pvcTemplates:
+          - name: pvc-test
+            mountPath: /mnt123
+            storage: 20Gi
       traits:
         - type: scaler
           properties:

@@ -115,6 +115,13 @@ template: {
 						if parameter["readinessProbe"] != _|_ {
 							readinessProbe: parameter.readinessProbe
 						}
+
+						if parameter["pvcTemplates"] != _|_ && parameter["volumeMounts"] == _|_ {
+							volumeMounts: [ for v in parameter.pvcTemplates {
+								name:      v.name
+								mountPath: v.mountPath
+							}]
+						}
 					}]
 
 					if parameter["hostAliases"] != _|_ {
@@ -165,6 +172,15 @@ template: {
 						volumes: deleteDupVolumesArray
 					}
 				}
+			}
+			if parameter["pvcTemplates"] != _|_ {
+				volumeClaimTemplates: [ for v in parameter.pvcTemplates {
+					metadata: name: v.name
+					spec: {
+						accessModes: [ "ReadWriteOnce"]
+						resources: requests: storage: v.storage
+					}
+				}]
 			}
 		}
 	}
@@ -240,6 +256,13 @@ template: {
 
 		// +usage=Specifies the attributes of the memory resource required for the container.
 		memory?: string
+
+		// +usage=CloneSet 允许用户配置 PVC 模板 volumeClaimTemplates，用来给每个 Pod 生成独享的 PVC
+		pvcTemplates?: [{
+			name:      string
+			storage:   =~"^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$"
+			mountPath: string
+		}]
 
 		volumeMounts?: {
 			// +usage=Mount PVC type volume
@@ -346,6 +369,11 @@ template: {
 				}
 				name: v.name
 			}
+		},
+
+		if parameter["pvcTemplates"] != _|_ for v in parameter.pvcTemplates {
+			name:      v.name
+			mountPath: v.mountPath
 		},
 
 		if parameter.volumeMounts != _|_ && parameter.volumeMounts.configMap != _|_ for v in parameter.volumeMounts.configMap {
