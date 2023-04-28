@@ -1,0 +1,20 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: daemon-set-demo
+spec:
+  components:
+    - name: daemonset
+      type: daemon-set
+      properties:
+        image: oamdev/hello-world
+        pvcTemplates:
+          - name: pvc-test
+            mountPath: /mnt123
+            storage: 20Gi
+        updateStrategy:
+          #maxUnavailable: 1
+          partition: 1
+          selectorLabels:
+            some-label-key1: sdf
+            some-label-key2: sdf
