@@ -16,6 +16,14 @@ import (
 }
 
 template: {
+	patch: metadata: annotations: {
+		if parameter["predownloadParallelism"] != _|_ {
+			"apps.kruise.io/image-predownload-parallelism": parameter.predownloadParallelism
+		}
+		if parameter["predownloadReady"] != _|_ {
+			"apps.kruise.io/image-predownload-min-updated-ready-pods": parameter.predownloadReady
+		}
+	}
 	output: {
 		apiVersion: "apps.kruise.io/v1alpha1"
 		kind:       "CloneSet"
@@ -195,6 +203,24 @@ template: {
 					}
 				}
 			}
+			if parameter["scaleStrategy"] != _|_ {
+				scaleStrategy: {
+					// 关闭pod所属的pvc被复用
+					if parameter.scaleStrategy.disablePVCReuse != _|_ {
+						disablePVCReuse: parameter.scaleStrategy.disablePVCReuse
+					}
+
+					// 用于CloneSet被缩容时，指定一些Pod来删除
+					if parameter.scaleStrategy.podsToDelete != _|_ {
+						podsToDelete: parameter.scaleStrategy.podsToDelete
+					}
+
+					// 流式扩容（绝对值或者百分比）
+					if parameter.scaleStrategy.maxUnavailable != _|_ {
+						maxUnavailable: parameter.scaleStrategy.maxUnavailable
+					}
+				}
+			}
 		}
 	}
 
@@ -330,6 +356,21 @@ template: {
 			// 它可以设置为一个绝对值或者百分比，如果不填 Kruise 会设置为默认值 0
 			maxSurge?: int | string
 		}
+		// +usage=扩容相关的策略
+		scaleStrategy?: {
+			// +usage=关闭pod所属的pvc被复用
+			disablePVCReuse?: *true | bool
+			// +usage=用于CloneSet被缩容时，指定一些Pod来删除。
+			podsToDelete?: [...string]
+			// +usage=流式扩容（绝对值或者百分比）
+			// 指定MaxUnavailable来限制扩容的步长，以达到服务应用影响最小化的目的。
+			maxUnavailable?: int | string
+		}
+		// 新镜像预热时的并发度
+		// 使用之前需要开启feature-gate，CloneSet 控制器会自动在所有旧版本 pod 所在 node 节点上预热你正在灰度发布的新版本镜像
+		//predownloadParallelism?: *10 | string | int
+		// 控制在少量新版本 Pod 已经升级成功之后再执行镜像预热(取值:绝对值数字或百分比)
+		//predownloadReady?: string | int
 	}
 
 	#HealthProbe: {

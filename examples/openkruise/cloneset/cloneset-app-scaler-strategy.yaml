@@ -1,0 +1,23 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: cloneset-reise
+spec:
+  components:
+    - name: reuse
+      type: clone-set
+      properties:
+        image: oamdev/hello-world
+        annotations:
+          a1: v1
+          a2: v2
+        scaleStrategy:
+#          disablePVCReuse: true
+#          podsToDelete:
+#            - reuse-74tcl
+#            - reuse-fcvwp
+          maxUnavailable: 3
+      traits:
+        - type: scaler
+          properties:
+            replicas: 5
