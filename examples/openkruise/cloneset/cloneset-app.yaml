@@ -8,12 +8,22 @@ spec:
       type: clone-set
       properties:
         image: oamdev/hello-world
-        volumeMounts:
-          pvc:
-            - name: test
-              mountPath: /mnt
-              claimName: test
+        pvcTemplates:
+          - name: pvc-test
+            mountPath: /mnt123
+            storage: 20Gi
       traits:
         - type: scaler
           properties:
             replicas: 2
+        - type: storage
+          properties:
+            emptyDir:
+              - name: test1
+                mountPath: /test/mount/emptydir
+            configMap:
+              - name: storage-test
+                mountPath: /test/mount/cm
+            pvc:
+              - name: test1
+                mountPath: /test/mount/pvc
