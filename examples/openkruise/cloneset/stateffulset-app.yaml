@@ -1,0 +1,39 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: stateful-set-demo111
+spec:
+  components:
+    - name: stateful111
+      type: stateful-set
+      properties:
+        image: oamdev/hello-world
+        pvcTemplates:
+          - name: pvc-test
+            mountPath: /mnt123
+            storage: 20Gi
+        updateStrategy:
+          maxUnavailable: 1
+          podUpdatePolicy: InPlaceIfPossible
+          gracePeriodSeconds: 2
+#          weightPriority:
+#            - weight: 70
+#              labels:
+#                test-key: bar
+#                test-key1: bar1
+#            - weight: 30
+#              labels:
+#                test-key: bar
+#                test-key1: bar1
+          orderPriority:
+            - some-label-key1
+            - some-label-key2
+        scaleStrategy:
+          maxUnavailable: 1
+        reserveOrdinals:
+          - 1
+          - 2
+      traits:
+        - type: scaler
+          properties:
+            replicas: 3
