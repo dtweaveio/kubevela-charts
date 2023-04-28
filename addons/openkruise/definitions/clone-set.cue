@@ -125,6 +125,8 @@ template: {
 					}
 				}
 			}
+
+			// volumeClaimTemplates
 			if parameter["pvcTemplates"] != _|_ {
 				volumeClaimTemplates: [ for v in parameter.pvcTemplates {
 					metadata: name: v.name
@@ -133,6 +135,65 @@ template: {
 						resources: requests: storage: v.storage
 					}
 				}]
+			}
+
+			if parameter["updateStrategy"] != _|_ {
+				updateStrategy: {
+					// 升级策略
+					if parameter.updateStrategy.podUpdatePolicy != _|_ {
+						type: parameter.updateStrategy.podUpdatePolicy
+						if parameter.updateStrategy.podUpdatePolicy == "InPlaceIfPossible" && parameter.updateStrategy.gracePeriodSeconds != _|_ {
+							inPlaceUpdateStrategy: gracePeriodSeconds: parameter.updateStrategy.gracePeriodSeconds
+						}
+					}
+
+					// 升级顺序
+					if parameter.updateStrategy.weightPriority != _|_ {
+						// 按照权重升级
+						priorityStrategy: {
+							weightPriority: [ for v in parameter.updateStrategy.weightPriority {
+								weight: v.weight
+								matchSelector: matchLabels: v.labels
+							}]
+						}
+					}
+					if parameter.updateStrategy.orderPriority != _|_ {
+						// 按照给定顺序升级
+						priorityStrategy: {
+							orderPriority: [ for v in parameter.updateStrategy.orderPriority {
+								orderedKey: v
+							}]
+						}
+					}
+
+					// 打散策略
+					if parameter.updateStrategy.scatterStrategy != _|_ {
+						scatterStrategy: [ for v in parameter.updateStrategy.scatterStrategy {
+							key:   v.key
+							value: v.value
+						}]
+					}
+
+					// 分批灰度升级或者回滚
+					if parameter.updateStrategy.partition != _|_ {
+						partition: parameter.updateStrategy.partition
+					}
+
+					// 暂停升级
+					if parameter.updateStrategy.paused != _|_ {
+						paused: parameter.updateStrategy.paused
+					}
+
+					// 最多不可用的 Pod 数量
+					if parameter.updateStrategy.maxUnavailable != _|_ {
+						maxUnavailable: parameter.updateStrategy.maxUnavailable
+					}
+
+					//  Pod 超卖数量
+					if parameter.updateStrategy.maxSurge != _|_ {
+						maxSurge: parameter.updateStrategy.maxSurge
+					}
+				}
 			}
 		}
 	}
@@ -209,13 +270,6 @@ template: {
 		// +usage=Specifies the attributes of the memory resource required for the container.
 		memory?: string
 
-		// +usage=CloneSet 允许用户配置 PVC 模板 volumeClaimTemplates，用来给每个 Pod 生成独享的 PVC
-		pvcTemplates?: [{
-			name:      string
-			storage:   =~"^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$"
-			mountPath: string
-		}]
-
 		// +usage=Instructions for assessing whether the container is alive.
 		livenessProbe?: #HealthProbe
 
@@ -227,6 +281,55 @@ template: {
 			ip: string
 			hostnames: [...string]
 		}]
+
+		// +usage=CloneSet 允许用户配置 PVC 模板 volumeClaimTemplates，用来给每个 Pod 生成独享的 PVC
+		pvcTemplates?: [...{
+			name:      string
+			storage:   =~"^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$"
+			mountPath: string
+		}]
+
+		// +usage=CloneSet更新与升级策略
+		updateStrategy?: {
+			// 	就地升级
+			//  +usage=用户指定重建升级还是原地升级，可选参数如下：
+			// 	ReCreate: 控制器会删除旧 Pod 和它的 PVC，然后用新版本重新创建出来。
+			//	InPlaceIfPossible: 控制器会优先尝试原地升级 Pod，如果不行再采用重建升级。具体参考下方阅读文档。
+			//	InPlaceOnly: 控制器只允许采用原地升级。因此，用户只能修改上一条中的限制字段，如果尝试修改其他字段会被 Kruise 拒绝。
+			podUpdatePolicy: *"InPlaceIfPossible" | "ReCreate" | "InPlaceOnly"
+			// +usage=用户如果配置了 gracePeriodSeconds 这个字段，控制器在原地升级的过程中会先把 Pod status 改为 not-ready，然后等一段时间（gracePeriodSeconds），最后再去修改 Pod spec 中的镜像版本。
+			// 这样，就为 endpoints-controller 这些控制器留出了充足的时间来将 Pod 从 endpoints 端点列表中去除。
+			gracePeriodSeconds?: int
+			// 顺序升级
+			// 按照权重升级
+			// +usage=按照权重（weight）进行升级，Pod 优先级是由所有 weights 列表中的 term 来计算 match selector 得出
+			weightPriority?: [...{
+				weight: int
+				labels: [string]: string
+			}]
+			// 按照给定顺序升级
+			// +usage=Pod 优先级是由 orderKey 的 value 决定，这里要求对应的 value 的结尾能解析为 int 值。比如 value "5" 的优先级是 5，value "sts-10" 的优先级是 10。
+			orderPriority?: [...string]
+			// 打散策略
+			// +usage=打散策略，这个策略定义了如何将一类 Pod 打散到整个发布过程中。
+			// 比如，针对一个 replica=10 的 CloneSet，我们在 3 个 Pod 中添加了 foo=bar 标签、并设置对应的 scatter 策略，那么在发布的时候这 3 个 Pod 会排在第 1、6、10 个发布。
+			scatterStrategy?: [...{
+				key:   string
+				value: string
+			}]
+			// 分批灰度升级
+			// +usage=保留旧版本 Pod 的数量或百分比，默认为 0。
+			// 可通partition分批升级或者回滚
+			partition?: int | string
+			// +usage=用户可以通过设置 paused 为 true 暂停发布，不过控制器还是会做 replicas 数量管理：
+			paused?: bool
+			// +usage=MaxUnavailable 限制下属最多不可用的 Pod 数量，防止大规模pod失效
+			// 它可以设置为一个绝对值或者百分比，如果不填 Kruise 会设置为默认值 20%。
+			maxUnavailable?: int | string
+			// +usage=控制最多能扩出来超过 replicas 的 Pod 数量，实现超卖功能
+			// 它可以设置为一个绝对值或者百分比，如果不填 Kruise 会设置为默认值 0
+			maxSurge?: int | string
+		}
 	}
 
 	#HealthProbe: {

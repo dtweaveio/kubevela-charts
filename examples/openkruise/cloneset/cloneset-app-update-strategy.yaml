@@ -1,0 +1,38 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: cloneset-sca
+spec:
+  components:
+    - name: sca
+      type: clone-set
+      properties:
+        image: oamdev/hello-world
+        updateStrategy:
+          podUpdatePolicy: InPlaceIfPossible
+          gracePeriodSeconds: 10
+#          weightPriority:
+#            - weight: 70
+#              labels:
+#                test-key: bar
+#                test-key1: bar1
+#            - weight: 30
+#              labels:
+#                test-key: bar
+#                test-key1: bar1
+#          orderPriority:
+#            - some-label-key1
+#            - some-label-key2
+#          scatterStrategy:
+#            - key: bar
+#              value: foo
+#            - key: foo1
+#              value: foo
+#          paused: false
+#          partition: 3
+#          maxUnavailable: 3
+#          maxSurge: 3
+      traits:
+        - type: scaler
+          properties:
+            replicas: 5
