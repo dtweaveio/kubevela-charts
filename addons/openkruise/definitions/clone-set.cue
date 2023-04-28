@@ -99,8 +99,8 @@ template: {
 						if parameter["volumes"] != _|_ && parameter["volumeMounts"] == _|_ {
 							volumeMounts: [ for v in parameter.volumes {
 								{
-									mountPath: v.mountPath
 									name:      v.name
+									mountPath: v.mountPath
 								}}]
 						}
 
@@ -116,6 +116,54 @@ template: {
 							readinessProbe: parameter.readinessProbe
 						}
 					}]
+
+					if parameter["hostAliases"] != _|_ {
+						// +patchKey=ip
+						hostAliases: parameter.hostAliases
+					}
+
+					if parameter["imagePullSecrets"] != _|_ {
+						imagePullSecrets: [ for v in parameter.imagePullSecrets {
+							name: v
+						},
+						]
+					}
+
+					if parameter["volumes"] != _|_ && parameter["volumeMounts"] == _|_ {
+						volumes: [ for v in parameter.volumes {
+							{
+								name: v.name
+								if v.type == "pvc" {
+									persistentVolumeClaim: claimName: v.claimName
+								}
+								if v.type == "configMap" {
+									configMap: {
+										defaultMode: v.defaultMode
+										name:        v.cmName
+										if v.items != _|_ {
+											items: v.items
+										}
+									}
+								}
+								if v.type == "secret" {
+									secret: {
+										defaultMode: v.defaultMode
+										secretName:  v.secretName
+										if v.items != _|_ {
+											items: v.items
+										}
+									}
+								}
+								if v.type == "emptyDir" {
+									emptyDir: medium: v.medium
+								}
+							}
+						}]
+					}
+
+					if parameter["volumeMounts"] != _|_ {
+						volumes: deleteDupVolumesArray
+					}
 				}
 			}
 		}
@@ -392,7 +440,7 @@ template: {
 		},
 	]
 
-	deDupVolumesArray: [
+	deleteDupVolumesArray: [
 		for val in [
 			for i, vi in volumesList {
 				for j, vj in volumesList if j < i && vi.name == vj.name {

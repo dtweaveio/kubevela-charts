@@ -9,10 +9,18 @@ spec:
       properties:
         image: oamdev/hello-world
         volumeMounts:
+          configMap:
+            - name: config-vol
+              cmName: test
+              mountPath: /etc/config
           pvc:
             - name: test
               mountPath: /mnt
               claimName: test
+        volumes:
+          - name: test1
+            mountPath: /mnt1
+            type: emptyDir
       traits:
         - type: scaler
           properties:

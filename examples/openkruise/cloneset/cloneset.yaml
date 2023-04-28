@@ -6,6 +6,26 @@ metadata:
   name: sample-data
 spec:
   replicas: 5
+  #minReadySeconds: 10
+  updateStrategy:
+    type: InPlaceIfPossible
+    inPlaceUpdateStrategy:
+      gracePeriodSeconds: 10
+    priorityStrategy:
+      weightPriority:
+        - weight: 50
+          matchSelector:
+            matchLabels:
+              test-key: foo
+        - weight: 30
+          matchSelector:
+            matchLabels:
+              test-key: bar
+  scaleStrategy:
+    maxUnavailable: 3
+    disablePVCReuse: true
+#    podsToDelete:
+#      - sample-data-9r8sp
   selector:
     matchLabels:
       app: sample
@@ -28,3 +48,4 @@ spec:
         resources:
           requests:
             storage: 20Gi
+
