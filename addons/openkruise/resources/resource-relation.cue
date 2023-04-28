@@ -18,6 +18,36 @@ resourceRelation: {
 			  childrenResourceType:
 			    - apiVersion: v1
 			      kind: Pod
+			- parentResourceType:
+			    group: apps.kruise.io
+			    kind: StatefulSet
+			  childrenResourceType:
+			    - apiVersion: v1
+			      kind: Pod
+			- parentResourceType:
+			    group: apps.kruise.io
+			    kind: DaemonSet
+			  childrenResourceType:
+			    - apiVersion: v1
+			      kind: Pod
+			- parentResourceType:
+			    group: apps.kruise.io
+			    kind: BroadcastJob
+			  childrenResourceType:
+			    - apiVersion: v1
+			      kind: Pod
+			- parentResourceType:
+			    group: apps.kruise.io
+			    kind: AdvancedCronJob
+			  childrenResourceType:
+			    - apiVersion: v1
+			      kind: Pod
+			- parentResourceType:
+			    group: apps.kruise.io
+			    kind: SidecarSet
+			  childrenResourceType:
+			    - apiVersion: v1
+			      kind: Pod
 			"""
 	}]
 }
