@@ -5,7 +5,7 @@ The chart repo for holding KubeVela's helm charts.
 
 ## Usage
 ```shell
-helm repo add kubevela https://kubevela.github.io/charts/
+helm repo add kubevela https://charts.dtweave.com/kubevela/
 helm repo update kubevela
 ```
 
@@ -13,5 +13,6 @@ helm repo update kubevela
 
 ```shell
 helm install kubevela kubevela/vela-core # install vela-core
+helm install --create-namespace -n vela-system kubevela kubevela/vela-core --wait
 helm install kubevela kubevela/vela-workflow # install vela-workflow
 ```
