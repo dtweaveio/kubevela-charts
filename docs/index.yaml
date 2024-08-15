@@ -3,7 +3,7 @@ entries:
   vela-core:
   - apiVersion: v2
     appVersion: 1.9.11
-    created: "2024-08-15T14:49:48.031685672Z"
+    created: "2024-08-15T15:04:05.77809759Z"
     description: A Helm chart for KubeVela core
     digest: 0436114f4cab9311e84f999648c72bc3640def44656d1f7a502009134bdf179f
     home: https://kubevela.io
@@ -16,9 +16,9 @@ entries:
   vela-prism:
   - apiVersion: v1
     appVersion: 0.6.0
-    created: "2024-08-15T14:49:48.032255222Z"
+    created: "2024-08-15T15:04:05.778567951Z"
     description: A Helm chart for KubeVela API Extensions
-    digest: e2f963334304912f88d2d5a7d73421b0de341837b2429cacf818e83ae456dcef
+    digest: 04f398215c13c776e03d5978ce6752674761c432f0ebf189bc61606bed69ccfa
     home: https://github.com/kubevela/vela-prism
     icon: https://kubevela.io/img/logo.svg
     name: vela-prism
@@ -26,4 +26,4 @@ entries:
     urls:
     - https://charts.dtweave.com/kubevela/vela-prism-0.6.0.tgz
     version: 0.6.0
-generated: "2024-08-15T14:49:48.025363205Z"
+generated: "2024-08-15T15:04:05.772940721Z"
