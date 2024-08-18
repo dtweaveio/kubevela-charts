@@ -12,7 +12,6 @@ helm repo update kubevela
 ## Install
 
 ```shell
-helm install kubevela kubevela/vela-core # install vela-core
 helm install --create-namespace -n vela-system kubevela kubevela/vela-core --wait
 helm install kubevela kubevela/vela-workflow # install vela-workflow
 ```
